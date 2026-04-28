@@ -138,7 +138,52 @@ const daftarProdi = [
   ...new Set(dataMahasiswaAwal.map((item) => item.prodi)),
 ];
 
+// Komponen untuk me-render setiap item kartu mahasiswa
+const renderKartuMahasiswa = (navigation) => ({ item }) => (
+  <TouchableOpacity
+    style={styles.kartuMahasiswa}
+    onPress={() => navigation.navigate("Detail", { mahasiswa: item })}
+  >
+    <View style={[styles.avatar, { backgroundColor: item.warna }]}>
+      <Text style={styles.avatarTeks}>{item.inisial}</Text>
+    </View>
+    <View style={styles.infoContainer}>
+      <Text style={styles.namaMhs}>{item.nama}</Text>
+      <Text style={styles.nimMhs}>NIM: {item.nim}</Text>
+      <Text style={styles.prodiMhs}>{item.prodi}</Text>
+    </View>
+    <Text style={styles.ipkMhs}>⭐ {item.ipk}</Text>
+  </TouchableOpacity>
+);
+
+// Komponen Empty State saat data tidak ditemukan
+const renderEmptyState = () => (
+  <View style={styles.emptyContainer}>
+    <Text style={styles.emptyEmoji}>😕</Text>
+    <Text style={styles.emptyTitle}>Data Tidak Ditemukan</Text>
+    <Text style={styles.emptyTeks}>
+      Coba ubah kata kunci pencarian atau kategori filter.
+    </Text>
+  </View>
+);
+
+// Komponen filter chip
+const renderFilterChip = (filterProdi, setFilterProdi) => ({ item }) => {
+  const isActive = filterProdi === item;
+  return (
+    <TouchableOpacity
+      style={[styles.filterButton, isActive && styles.filterButtonActive]}
+      onPress={() => setFilterProdi(item)}
+    >
+      <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
+        {item}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
 export default function DaftarMahasiswa({ navigation }) {
+
   const [data, setData] = useState(dataMahasiswaAwal);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterProdi, setFilterProdi] = useState("Semua");
@@ -164,34 +209,6 @@ export default function DaftarMahasiswa({ navigation }) {
     return cocokNama && cocokProdi;
   });
 
-  // Komponen untuk me-render setiap item kartu mahasiswa
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.kartuMahasiswa}
-      onPress={() => navigation.navigate("Detail", { mahasiswa: item })}
-    >
-      <View style={[styles.avatar, { backgroundColor: item.warna }]}>
-        <Text style={styles.avatarTeks}>{item.inisial}</Text>
-      </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.namaMhs}>{item.nama}</Text>
-        <Text style={styles.nimMhs}>NIM: {item.nim}</Text>
-        <Text style={styles.prodiMhs}>{item.prodi}</Text>
-      </View>
-      <Text style={styles.ipkMhs}>⭐ {item.ipk}</Text>
-    </TouchableOpacity>
-  );
-
-  // Komponen Empty State saat data tidak ditemukan
-  const renderEmptyComponent = () => (
-    <View style={styles.emptyContainer}>
-      <Text style={styles.emptyEmoji}>😕</Text>
-      <Text style={styles.emptyTitle}>Data Tidak Ditemukan</Text>
-      <Text style={styles.emptyTeks}>
-        Coba ubah kata kunci pencarian atau kategori filter.
-      </Text>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -222,27 +239,7 @@ export default function DaftarMahasiswa({ navigation }) {
           showsHorizontalScrollIndicator={false}
           data={daftarProdi}
           keyExtractor={(item) => item}
-          renderItem={({ item }) => {
-            const isActive = filterProdi === item;
-            return (
-              <TouchableOpacity
-                style={[
-                  styles.filterButton,
-                  isActive && styles.filterButtonActive,
-                ]}
-                onPress={() => setFilterProdi(item)}
-              >
-                <Text
-                  style={[
-                    styles.filterText,
-                    isActive && styles.filterTextActive,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </TouchableOpacity>
-            );
-          }}
+          renderItem={renderFilterChip(filterProdi, setFilterProdi)}
           contentContainerStyle={{ paddingHorizontal: 16 }}
         />
       </View>
@@ -251,9 +248,9 @@ export default function DaftarMahasiswa({ navigation }) {
       <FlatList
         data={dataFiltered}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={renderKartuMahasiswa(navigation)}
         contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={renderEmptyComponent}
+        ListEmptyComponent={renderEmptyState}
         ListHeaderComponent={
           <Text style={styles.total}>
             Menampilkan {dataFiltered.length} mahasiswa

@@ -85,16 +85,6 @@ const jadwalKuliah = [
     title: "Jumat",
     data: [], // Kosong untuk mengetes state renderSectionFooter
   },
-  {
-    id: "6",
-    title: "Sabtu",
-    data: [], // kosong, akan muncul "Tidak ada jadwal"
-  },
-  {
-    id: "7",
-    title: "Minggu",
-    data: [], // kosong, akan muncul "Tidak ada jadwal"
-  },
 ];
 
 const namaHari = [
@@ -108,58 +98,71 @@ const namaHari = [
 ];
 const hariIni = namaHari[new Date().getDay()];
 
+// Komponen untuk me-render setiap item jadwal
+const renderJadwalItem = ({ item }) => (
+  <View style={styles.item}>
+    <View style={styles.jamKotak}>
+      <Text style={styles.jam}>{item.jam.split(" - ")[0]}</Text>
+      <Text style={styles.jamKecil}>{item.jam.split(" - ")[1]}</Text>
+    </View>
+    <View style={styles.detail}>
+      <Text style={styles.matkul}>{item.matkul}</Text>
+      <Text style={styles.ruang}>Ruang: {item.ruang}</Text>
+    </View>
+  </View>
+);
+
+// Komponen untuk me-render header section (Hari)
+const renderHariHeader =
+  (hariIni) =>
+  ({ section }) => (
+    <View
+      style={[
+        styles.sectionHeader,
+        section.title === hariIni && styles.sectionHeaderAktif,
+      ]}
+    >
+      <Text
+        style={[
+          styles.sectionTitle,
+          section.title === hariIni && styles.sectionTitleAktif,
+        ]}
+      >
+        {section.title}
+        {section.title === hariIni ? "  (Hari Ini)" : ""}
+      </Text>
+      <Text
+        style={[
+          styles.sectionJumlah,
+          section.title === hariIni && styles.sectionJumlahAktif,
+        ]}
+      >
+        {section.data.length} mata kuliah
+      </Text>
+    </View>
+  );
+
+// Komponen untuk me-render footer section (jika kosong)
+const renderJadwalFooter = ({ section }) =>
+  section.data.length === 0 ? (
+    <View style={styles.sectionKosong}>
+      <Text style={styles.kosongTeks}>Tidak ada jadwal</Text>
+    </View>
+  ) : null;
+
+// Komponen separator
+const ItemSeparator = () => <View style={styles.separator} />;
+
 export default function JadwalKuliah() {
   return (
     <View style={styles.container}>
       <SectionList
         sections={jadwalKuliah}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <View style={styles.jamKotak}>
-              <Text style={styles.jam}>{item.jam.split(" - ")[0]}</Text>
-              <Text style={styles.jamKecil}>{item.jam.split(" - ")[1]}</Text>
-            </View>
-            <View style={styles.detail}>
-              <Text style={styles.matkul}>{item.matkul}</Text>
-              <Text style={styles.ruang}>Ruang: {item.ruang}</Text>
-            </View>
-          </View>
-        )}
-        renderSectionHeader={({ section }) => (
-          <View
-            style={[
-              styles.sectionHeader,
-              section.title === hariIni && styles.sectionHeaderAktif,
-            ]}
-          >
-            <Text
-              style={[
-                styles.sectionTitle,
-                section.title === hariIni && styles.sectionTitleAktif,
-              ]}
-            >
-              {section.title}
-              {section.title === hariIni ? "  (Hari Ini)" : ""}
-            </Text>
-            <Text
-              style={[
-                styles.sectionJumlah,
-                section.title === hariIni && styles.sectionJumlahAktif,
-              ]}
-            >
-              {section.data.length} mata kuliah
-            </Text>
-          </View>
-        )}
-        renderSectionFooter={({ section }) =>
-          section.data.length === 0 ? (
-            <View style={styles.sectionKosong}>
-              <Text style={styles.kosongTeks}>Tidak ada jadwal</Text>
-            </View>
-          ) : null
-        }
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        renderItem={renderJadwalItem}
+        renderSectionHeader={renderHariHeader(hariIni)}
+        renderSectionFooter={renderJadwalFooter}
+        ItemSeparatorComponent={ItemSeparator}
         ListHeaderComponent={
           <View style={styles.headerList}>
             <Text style={styles.headerJudul}>Jadwal Kuliah</Text>
