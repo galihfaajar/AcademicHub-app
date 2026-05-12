@@ -1,35 +1,20 @@
-import { useState, useEffect, useCallback } from 'react'; 
+import { useState, useCallback } from 'react'; 
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Alert, ScrollView } from 'react-native'; 
-import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { useFocusEffect } from '@react-navigation/native';
 import { ambil } from '../utils/storage';
+import { useLocalData } from '../hooks/useLocalData';
+
   
 const STORAGE_KEY = '@todos_list'; 
 const KEY_PREFERENSI = '@preferensi_user';
 const KATEGORI = ['Pekerjaan', 'Belajar', 'Pribadi'];
   
 export default function TodoPersisten() { 
-  const [todos, setTodos]   = useState([]); 
+  const { data: todos, isLoading, updateData: setTodos } = useLocalData(STORAGE_KEY, []);
   const [input, setInput]   = useState(''); 
   const [kategoriTerpilih, setKategoriTerpilih] = useState('Pekerjaan');
   const [filterKategori, setFilterKategori] = useState('Semua');
-  const [isLoading, setLoading] = useState(true); 
   const [prefs, setPrefs] = useState({ temaDarkMode: false, ukuranFont: 'sedang' });
-
-  // LOAD: Muat data saat pertama kali buka
-  useEffect(() => { 
-    const muatTodos = async () => { 
-      try { 
-        const rawTodos = await AsyncStorage.getItem(STORAGE_KEY); 
-        if (rawTodos !== null) setTodos(JSON.parse(rawTodos)); 
-      } catch (e) { 
-        Alert.alert('Error', 'Gagal memuat data tersimpan'); 
-      } finally { 
-        setLoading(false); 
-      } 
-    }; 
-    muatTodos(); 
-  }, []); 
 
   // Muat Preferensi (Dark Mode & Font) setiap kali halaman difokuskan
   useFocusEffect(
@@ -45,19 +30,7 @@ export default function TodoPersisten() {
       muatPrefs();
     }, [])
   );
-  
-  // SAVE: Simpan otomatis setiap todos berubah 
-  useEffect(() => { 
-    if (isLoading) return; 
-    const simpanData = async () => { 
-      try { 
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(todos)); 
-      } catch (e) { 
-        Alert.alert('Error', 'Gagal menyimpan data'); 
-      } 
-    }; 
-    simpanData(); 
-  }, [todos]); 
+ 
   
   const tambah = () => { 
     if (!input.trim()) return; 

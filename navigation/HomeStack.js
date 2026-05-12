@@ -10,15 +10,14 @@ export default function HomeStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: "#1F4E79" },
-        headerTintColor: "#FFFFFF",
-        headerTitleAlign: "center",
+        headerShown: false,
       }}
     >
       <Stack.Screen
         name="Home"
         component={DaftarMahasiswa}
         options={({ navigation }) => ({
+          headerShown: false,
           title: "Beranda",
           headerLeft: () => (
             <TouchableOpacity
@@ -32,7 +31,10 @@ export default function HomeStack() {
       <Stack.Screen
         name="Detail"
         component={HalamanDetail}
-        options={{ title: "Detail" }}
+        options={{ 
+          title: "Detail",
+          headerShown: false,
+        }}
       />
     </Stack.Navigator>
   );

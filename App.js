@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import Screens
 import HalamanLogin from './screens/HalamanLogin'; 
-import HalamanUtama from './screens/HalamanUtama'; 
+import HalamanDashboardIntegrated from './screens/HalamanDashboardIntegrated'; 
 import TabNavigator from "./navigation/TabNavigator";
 import HalamanTentang from "./screens/HalamanTentang";
 import HalamanPengaturan from "./screens/HalamanPengaturan";
@@ -17,6 +17,12 @@ import DaftarProduk from "./screens/DaftarProduk";
 import TodoPersisten from "./screens/TodoPersisten";
 import PengaturanPersisten from "./screens/PengaturanPersisten";
 import FormRegistrasi from "./screens/FormRegistrasi";
+import DemoLifecycle from "./screens/DemoLifecycle";
+import SearchDebounce from "./screens/SearchDebounce";
+import DashboardPolling from "./screens/DashboardPolling";
+import DaftarMahasiswaAsync from "./screens/DaftarMahasiswaAsync";
+
+
 
 const Stack = createNativeStackNavigator(); 
 const Drawer = createDrawerNavigator();
@@ -46,16 +52,13 @@ function MainApp({ session, onLogout }) {
     >
       <Drawer.Screen
         name="Dashboard"
-        options={{ title: "Beranda" }}
+        options={{ 
+          title: "Beranda",
+          headerShown: false,
+        }}
       >
-        {() => <HalamanUtama session={session} onLogout={onLogout} />}
+        {() => <HalamanDashboardIntegrated session={session} onLogout={onLogout} />}
       </Drawer.Screen>
-      
-      <Drawer.Screen
-        name="Utama"
-        component={TabNavigator}
-        options={{ title: "Menu Utama", headerShown: false }}
-      />
       <Drawer.Screen
         name="Tentang"
         component={HalamanTentang}
@@ -86,6 +89,28 @@ function MainApp({ session, onLogout }) {
         component={HalamanPengaturan}
         options={{ title: "Pengaturan Aplikasi" }}
       />
+      <Drawer.Screen
+        name="DemoLifecycle"
+        component={DemoLifecycle}
+        options={{ title: "Demo Lifecycle" }}
+      />
+      <Drawer.Screen
+        name="SearchDebounce"
+        component={SearchDebounce}
+        options={{ title: "Search Debounce" }}
+      />
+      <Drawer.Screen
+        name="DashboardPolling"
+        component={DashboardPolling}
+        options={{ title: "Dashboard Polling" }}
+      />
+      <Drawer.Screen
+        name="DaftarMahasiswaAsync"
+        component={DaftarMahasiswaAsync}
+        options={{ title: "Daftar Mahasiswa (Async)" }}
+      />
+
+
     </Drawer.Navigator>
   );
 }
